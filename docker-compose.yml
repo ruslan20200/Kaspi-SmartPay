@@ -1,0 +1,113 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: kaspi_postgres
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - kaspi_network
+
+  redis:
+    image: redis:7-alpine
+    container_name: kaspi_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - kaspi_network
+
+  mock_abs:
+    build:
+      context: ./mock_abs
+    container_name: kaspi_mock_abs
+    restart: unless-stopped
+    environment:
+      TZ: Asia/Almaty
+    ports:
+      - "8001:8001"
+    networks:
+      - kaspi_network
+
+  middleware:
+    build:
+      context: ./middleware
+    container_name: kaspi_middleware
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      TZ: Asia/Almaty
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      mock_abs:
+        condition: service_started
+    networks:
+      - kaspi_network
+
+  celery_worker:
+    build:
+      context: ./middleware
+    container_name: kaspi_celery_worker
+    restart: unless-stopped
+    command: celery -A worker:celery_app worker -B -l info
+    env_file:
+      - .env
+    environment:
+      TZ: Asia/Almaty
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      mock_abs:
+        condition: service_started
+      middleware:
+        condition: service_started
+    networks:
+      - kaspi_network
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: kaspi_frontend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      REACT_APP_API_URL: http://localhost:8000
+    depends_on:
+      middleware:
+        condition: service_started
+    networks:
+      - kaspi_network
+
+volumes:
+  postgres_data:
+
+networks:
+  kaspi_network:
+    driver: bridge
