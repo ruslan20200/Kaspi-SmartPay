@@ -1,0 +1,21 @@
+import { useEffect } from 'react';
+import { Route, Routes } from 'react-router-dom';
+import PaymentPage from './pages/PaymentPage.jsx';
+import SuccessPage from './pages/SuccessPage.jsx';
+import AdminPage from './pages/AdminPage.jsx';
+
+export default function App() {
+  useEffect(() => {
+    if (typeof Notification !== 'undefined' && Notification.permission === 'default') {
+      Notification.requestPermission().catch(() => {});
+    }
+  }, []);
+
+  return (
+    <Routes>
+      <Route path="/" element={<PaymentPage />} />
+      <Route path="/success" element={<SuccessPage />} />
+      <Route path="/admin" element={<AdminPage />} />
+    </Routes>
+  );
+}

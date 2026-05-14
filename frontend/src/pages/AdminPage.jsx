@@ -136,7 +136,7 @@ export default function AdminPage() {
     <main className="admin-screen">
       <header className="admin-header">
         <div>
-          <p>Kaspi SmartPay 24/7</p>
+          <p>Kaspi Sync</p>
           <h1>Trust & Penalty Policy Control Center</h1>
         </div>
         <time>{now.toLocaleString('ru-KZ')}</time>

@@ -172,7 +172,7 @@ async def sync_credit(payload: SyncCreditRequest):
         return _structured_error(
             409,
             "AMOUNT_MISMATCH",
-            "ABS remaining amount differs from SmartPay credit cache",
+            "ABS remaining amount differs from Kaspi Sync credit cache",
         )
     if simulation_mode == "CREDIT_NOT_FOUND":
         return _structured_error(404, "CREDIT_NOT_FOUND", "Credit not found in legacy ABS")

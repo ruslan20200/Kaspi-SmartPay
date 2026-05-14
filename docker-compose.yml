@@ -105,6 +105,22 @@ services:
     networks:
       - kaspi_network
 
+  pwa_frontend:
+    build:
+      context: ./pwa-frontend
+    container_name: kaspi_pwa_frontend
+    restart: unless-stopped
+    ports:
+      - "3001:3000"
+    environment:
+      REACT_APP_API_URL: http://localhost:8000
+      PORT: 3000
+    depends_on:
+      middleware:
+        condition: service_started
+    networks:
+      - kaspi_network
+
 volumes:
   postgres_data:
 

@@ -54,7 +54,7 @@ export default function SuccessPage() {
         Notification.permission === 'granted'
       ) {
         notifiedRef.current = true;
-        new Notification('Kaspi SmartPay: payment synced with ABS');
+        new Notification('Kaspi Sync: payment synced with ABS');
       }
     } catch (requestError) {
       setError(requestError.message);
@@ -102,7 +102,7 @@ export default function SuccessPage() {
               ? 'Payment sync failed'
               : isManualReview
                 ? 'Payment requires bank review'
-                : 'Payment accepted by SmartPay 24/7'}
+                : 'Payment accepted by Kaspi Sync'}
         </h1>
         <strong className="result-amount">{formatTenge(amount)}</strong>
         <p className="result-copy">
@@ -110,7 +110,7 @@ export default function SuccessPage() {
             ? 'Reserve remains locked while reconciliation exception is reviewed.'
             : isSynced
               ? 'Reserved funds were captured after ABS confirmation.'
-              : 'SmartPay holds the reserve and waits for legacy ABS synchronization.'}
+              : 'Kaspi Sync holds the reserve and waits for legacy ABS synchronization.'}
         </p>
 
         {!isSynced && !isFailed && !isManualReview && (

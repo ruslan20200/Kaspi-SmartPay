@@ -16,7 +16,7 @@ REDIS_URL = os.getenv("REDIS_URL", "redis://redis:6379/0")
 ABS_URL = os.getenv("ABS_URL", "http://mock_abs:8001")
 MANUAL_REVIEW_ERRORS = {"AMOUNT_MISMATCH", "CREDIT_NOT_FOUND", "ALREADY_CLOSED"}
 
-celery_app = Celery("kaspi_smartpay", broker=REDIS_URL, backend=REDIS_URL)
+celery_app = Celery("kaspi_sync", broker=REDIS_URL, backend=REDIS_URL)
 celery_app.conf.timezone = "Asia/Almaty"
 celery_app.conf.beat_schedule = {
     "poll-and-sync-every-30-seconds": {

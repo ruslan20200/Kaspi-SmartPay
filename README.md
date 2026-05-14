@@ -1,8 +1,8 @@
-# Kaspi SmartPay 24/7
+# Kaspi Sync
 
 Trust & Penalty Policy Layer for legacy ABS payments.
 
-SmartPay Penalty Shield is a hackathon demo showing how a bank can accept and prove time-critical loan payments even when a legacy ABS is unavailable outside the banking day.
+Kaspi Sync is a hackathon demo showing how a bank can accept and prove time-critical loan payments even when a legacy ABS is unavailable outside the banking day.
 
 ## What Problem We Solve
 
@@ -10,7 +10,7 @@ Legacy ABS systems can be offline at night, on weekends, or during maintenance w
 
 > Did the customer pay on time, who proves it, and why should penalties be applied or not applied?
 
-SmartPay Penalty Shield adds a policy layer:
+Kaspi Sync adds a policy layer:
 
 - fixes immutable `accepted_at`;
 - reserves funds in a wallet ledger;
@@ -21,7 +21,7 @@ SmartPay Penalty Shield adds a policy layer:
 
 ## Architecture
 
-- Client UI: Direct Legacy Mode vs SmartPay Middleware Mode.
+- Client UI: Direct Legacy Mode vs Kaspi Sync Middleware Mode.
 - Middleware Trust Layer: accepts payments 24/7, owns idempotency and policy decisions.
 - Wallet Ledger: reserve, capture, release events in integer tiyin.
 - Policy Engine: cutoff/grace/ABS downtime decisions in `Asia/Almaty`.
@@ -50,19 +50,19 @@ Suggested story:
 2. Force ABS `OFFLINE`.
 3. Open `/`.
 4. Select `Direct Legacy Mode` and pay: the legacy payment fails because ABS is unavailable.
-5. Select `SmartPay Middleware Mode` and pay: SmartPay accepts the payment, reserves funds, calculates policy, and opens a receipt.
+5. Select `Kaspi Sync Middleware Mode` and pay: Kaspi Sync accepts the payment, reserves funds, calculates policy, and opens a receipt.
 6. On `/success?payment_id=...`, show `Penalty Decision` and `Audit Proof`.
 7. Return to `/admin`; show pending queue and policy metrics.
 8. Force ABS `ONLINE`; wait for the worker; payment becomes `SYNCED_ABS` and reserve is captured.
 9. Set simulation mode `AMOUNT_MISMATCH`.
-10. Create another SmartPay payment while ABS is online or bring ABS online after queueing.
+10. Create another Kaspi Sync payment while ABS is online or bring ABS online after queueing.
 11. Worker moves the payment to `MANUAL_REVIEW`; reserve remains locked and the admin dashboard shows a reconciliation exception.
 
 ## Why This Is More Than a Queue
 
 A queue says: "we will try later."
 
-SmartPay Penalty Shield says:
+Kaspi Sync says:
 
 - when the payment was accepted: immutable `accepted_at`;
 - what product deadline applied: `cutoff_at` and `deadline_at`;
@@ -170,7 +170,7 @@ Smoke API:
 - Repeat `/pay` with the same `request_id`; it should return the same `payment_id`.
 - Force ABS online; worker should move payment to `SYNCED_ABS`.
 - Wallet reserved amount should return to zero after capture.
-- Set simulation mode `AMOUNT_MISMATCH`; another SmartPay payment should become `MANUAL_REVIEW`.
+- Set simulation mode `AMOUNT_MISMATCH`; another Kaspi Sync payment should become `MANUAL_REVIEW`.
 - Manual review keeps reserved money locked.
 
 Browser smoke:

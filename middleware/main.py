@@ -92,12 +92,12 @@ def json_safe(value: Any) -> Any:
 
 def policy_receipt_text(policy_status: str, policy_decision: str) -> str:
     if policy_status == "PROTECTED":
-        return "Penalty shield: active. Basis: accepted_at before cutoff or grace policy."
+        return "Kaspi Sync protection: active. Basis: accepted_at before cutoff or grace policy."
     if policy_status == "REVIEW_REQUIRED":
         if policy_decision == "ABS_DOWNTIME_REVIEW_REQUIRED":
-            return "Penalty shield: bank review required. Basis: payment accepted after cutoff during ABS downtime."
-        return "Penalty shield: bank review required."
-    return "Penalty shield: not applied. Basis: payment accepted after cutoff."
+            return "Kaspi Sync protection: bank review required. Basis: payment accepted after cutoff during ABS downtime."
+        return "Kaspi Sync protection: bank review required."
+    return "Kaspi Sync protection: not applied. Basis: payment accepted after cutoff."
 
 
 async def reset_database(connection: asyncpg.Connection) -> None:
@@ -151,14 +151,19 @@ async def lifespan(_: FastAPI):
 
 
 app = FastAPI(
-    title="Kaspi SmartPay 24/7 - Trust & Penalty Policy Layer",
+    title="Kaspi Sync - Trust & Penalty Policy Layer",
     version="3.0.0",
     lifespan=lifespan,
 )
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
+    allow_origins=[
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "http://localhost:3001",
+        "http://127.0.0.1:3001",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -237,7 +242,7 @@ async def payment_response(payment_id: UUID, message: str | None = None) -> Paym
     default_message = (
         "Payment synced with legacy ABS"
         if row["status"] == PaymentState.SYNCED_ABS.value
-        else "Payment accepted by SmartPay Trust Layer; ABS synchronization is pending."
+        else "Payment accepted by Kaspi Sync Trust Layer; ABS synchronization is pending."
     )
     return PaymentResponse(
         payment_id=row["id"],
@@ -562,7 +567,7 @@ async def pay(payload: PaymentRequest):
                     amount_tiyin,
                     updated_wallet["balance_tiyin"],
                     updated_wallet["reserved_tiyin"],
-                    json_safe({"reason": "SmartPay Trust Layer accepted payment", "policy": policy}),
+                    json_safe({"reason": "Kaspi Sync Trust Layer accepted payment", "policy": policy}),
                 )
 
                 payment_for_hash = dict(payment)
@@ -1045,9 +1050,9 @@ async def demo_scenarios():
                 "steps": ["Force ABS OFFLINE", "Try Direct Legacy Mode", "Observe ABS unavailable error"],
             },
             {
-                "id": "smartpay_offline_accepted",
-                "title": "SmartPay offline accepted and pending",
-                "steps": ["Force ABS OFFLINE", "Pay through SmartPay", "Open receipt with Penalty Decision and Audit Proof"],
+                "id": "kaspi_sync_offline_accepted",
+                "title": "Kaspi Sync offline accepted and pending",
+                "steps": ["Force ABS OFFLINE", "Pay through Kaspi Sync", "Open receipt with Penalty Decision and Audit Proof"],
             },
             {
                 "id": "abs_online_sync_success",
@@ -1057,7 +1062,7 @@ async def demo_scenarios():
             {
                 "id": "amount_mismatch_manual_review",
                 "title": "Amount mismatch goes to manual review",
-                "steps": ["Set simulation mode AMOUNT_MISMATCH", "Create SmartPay payment", "Worker moves it to MANUAL_REVIEW"],
+                "steps": ["Set simulation mode AMOUNT_MISMATCH", "Create Kaspi Sync payment", "Worker moves it to MANUAL_REVIEW"],
             },
         ]
     }

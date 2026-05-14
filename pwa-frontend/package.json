@@ -1,5 +1,5 @@
 {
-  "name": "kaspi-sync-frontend",
+  "name": "kaspi-sync-pwa-frontend",
   "version": "1.0.0",
   "private": true,
   "dependencies": {

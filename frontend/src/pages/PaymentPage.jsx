@@ -30,14 +30,14 @@ function dueLabel(value) {
 
 export default function PaymentPage() {
   const navigate = useNavigate();
-  const smartPayRequestId = useRef(null);
+  const syncRequestId = useRef(null);
   const [selectedClient, setSelectedClient] = useState('client_001');
   const [wallet, setWallet] = useState(null);
   const [credits, setCredits] = useState([]);
   const [absStatus, setAbsStatus] = useState({ online: false, mode: 'auto' });
   const [loading, setLoading] = useState(true);
   const [selectedCredit, setSelectedCredit] = useState(null);
-  const [mode, setMode] = useState('smartpay');
+  const [mode, setMode] = useState('sync');
   const [paying, setPaying] = useState(false);
   const [error, setError] = useState('');
   const [comparison, setComparison] = useState(null);
@@ -101,16 +101,16 @@ export default function PaymentPage() {
         return;
       }
 
-      if (!smartPayRequestId.current) {
-        smartPayRequestId.current = crypto.randomUUID();
+      if (!syncRequestId.current) {
+        syncRequestId.current = crypto.randomUUID();
       }
       const paymentData = await createPayment(
         selectedClient,
         selectedCredit.credit_id,
         selectedCreditAmount,
-        smartPayRequestId.current
+        syncRequestId.current
       );
-      smartPayRequestId.current = null;
+      syncRequestId.current = null;
       navigate(`/success?payment_id=${paymentData.payment_id}`, { state: { paymentData } });
     } catch (requestError) {
       if (mode === 'legacy') {
@@ -123,7 +123,7 @@ export default function PaymentPage() {
         setError(requestError.message);
       }
     } finally {
-      if (mode === 'smartpay') smartPayRequestId.current = null;
+      if (mode === 'sync') syncRequestId.current = null;
       setPaying(false);
     }
   }
@@ -134,7 +134,7 @@ export default function PaymentPage() {
         <div className="brand-lockup">
           <span className="brand-circle">K</span>
           <div>
-            <strong>Kaspi SmartPay 24/7</strong>
+            <strong>Kaspi Sync</strong>
             <p>Trust & Penalty Policy Layer for legacy ABS payments</p>
           </div>
         </div>
@@ -148,8 +148,8 @@ export default function PaymentPage() {
         <button className={mode === 'legacy' ? 'active' : ''} disabled={paying} onClick={() => setMode('legacy')}>
           Direct Legacy Mode
         </button>
-        <button className={mode === 'smartpay' ? 'active' : ''} disabled={paying} onClick={() => setMode('smartpay')}>
-          SmartPay Middleware Mode
+        <button className={mode === 'sync' ? 'active' : ''} disabled={paying} onClick={() => setMode('sync')}>
+          Kaspi Sync Middleware Mode
         </button>
       </section>
 
@@ -158,8 +158,8 @@ export default function PaymentPage() {
           <h2>Direct Legacy Mode</h2>
           <p>Payment goes straight to legacy ABS. If ABS is closed or unavailable, the customer gets an error.</p>
         </article>
-        <article className={mode === 'smartpay' ? 'active' : ''}>
-          <h2>SmartPay Middleware Mode</h2>
+        <article className={mode === 'sync' ? 'active' : ''}>
+          <h2>Kaspi Sync Middleware Mode</h2>
           <p>
             Payment is accepted in the Trust Layer: accepted_at is fixed, funds are reserved, policy engine decides
             penalty protection, and ABS sync happens later.
@@ -198,7 +198,7 @@ export default function PaymentPage() {
         <div className="credits-section">
           <div className="section-heading">
             <p>Customer credits</p>
-            <h1>{mode === 'legacy' ? 'Legacy shows the banking-day limit' : 'SmartPay accepts payments 24/7'}</h1>
+            <h1>{mode === 'legacy' ? 'Legacy shows the banking-day limit' : 'Kaspi Sync accepts payments 24/7'}</h1>
           </div>
 
           {loading && <div className="empty-state">Loading customer data...</div>}
@@ -243,13 +243,13 @@ export default function PaymentPage() {
               </div>
               <div>
                 <dt>Mode</dt>
-                <dd>{mode === 'legacy' ? 'Direct Legacy Mode' : 'SmartPay Middleware Mode'}</dd>
+                <dd>{mode === 'legacy' ? 'Direct Legacy Mode' : 'Kaspi Sync Middleware Mode'}</dd>
               </div>
             </dl>
 
-            {mode === 'smartpay' && (
+            {mode === 'sync' && (
               <div className="offline-warning">
-                SmartPay will reserve funds, calculate the cutoff policy decision, and issue an audit-proof receipt.
+                Kaspi Sync will reserve funds, calculate the cutoff policy decision, and issue an audit-proof receipt.
               </div>
             )}
             {!absStatus.online && mode === 'legacy' && (
@@ -261,7 +261,7 @@ export default function PaymentPage() {
                 Cancel
               </button>
               <button className="primary-button" disabled={paying} onClick={handleConfirmPayment}>
-                {paying ? 'Processing...' : mode === 'legacy' ? 'Pay via Legacy' : 'Confirm SmartPay'}
+                {paying ? 'Processing...' : mode === 'legacy' ? 'Pay via Legacy' : 'Confirm Kaspi Sync'}
               </button>
             </div>
           </section>
