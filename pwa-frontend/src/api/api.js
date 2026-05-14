@@ -112,6 +112,10 @@ export function getABSHealth() {
   return getAbsHealth();
 }
 
+export function getArchitecture() {
+  return unwrap(api.get('/admin/architecture'));
+}
+
 export function getAbsStatus() {
   return unwrap(api.get('/abs/status'));
 }

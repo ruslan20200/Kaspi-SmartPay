@@ -86,6 +86,10 @@ export async function getABSHealth() {
   return unwrap(api.get('/admin/abs-health'));
 }
 
+export async function getArchitecture() {
+  return unwrap(api.get('/admin/architecture'));
+}
+
 export async function getABSStatus() {
   return unwrap(api.get('/abs/status'));
 }
